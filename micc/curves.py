@@ -891,44 +891,57 @@ def matrix_is_multicurve(beta):
     return False if counter == len(top) else True
 
 
+def _eval_perm(ladder_perm):
+    if not ladder_is_multicurve(*ladder_perm):
+        perm = CurvePair(*ladder_perm)
+        # Force evaluation of distance
+        dist = perm.distance
+        return perm, dist
+    return None, None
+
 def test_permutations(original_ladder):
     distance4 = []
     distance3 = []
-    #from curvepair import CurvePair
-    ladder = deepcopy(original_ladder)
-    if not original_ladder is None:
-        for i in range(len(ladder[0])):
-            if not ladder_is_multicurve(*ladder):
-                perm = CurvePair(*ladder)
-            else:
-                perm = None
-            if not perm is None :
-                if perm.distance == 4:
-                    distance4.append(deepcopy(perm))
-                else:
-                    distance3.append(deepcopy(perm))
-            else: pass
-            first_vertex = ladder[0].pop(0)
-            ladder[0].append(first_vertex)
-
-        if len(distance4) == 0:
-            print(' Found no distance four permutations of the ladder. ')
-
-        if distance3:
-            print('Distance 3 single curves: ')
-            for curve in distance3:
-                print('top   : ', curve.ladder[0])
-                print('bottom: ', curve.ladder[1])
-        if distance4:
-            print('Distance 4+ single curves: ')
-            for curve in distance4:
-                print('top   : ', curve.ladder[0])
-                print('bottom: ', curve.ladder[1])
-
-        return distance4
-    else:
+    
+    if original_ladder is None:
         print("You didn't give me a ladder! ")
         return []
+        
+    ladder = deepcopy(original_ladder)
+    perms_to_test = []
+    
+    for i in range(len(ladder[0])):
+        perms_to_test.append(deepcopy(ladder))
+        first_vertex = ladder[0].pop(0)
+        ladder[0].append(first_vertex)
+
+    import concurrent.futures
+    
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = list(executor.map(_eval_perm, perms_to_test))
+        
+    for perm, dist in results:
+        if perm is not None:
+            if dist == 4 or dist == 'at least 4!':
+                distance4.append(perm)
+            else:
+                distance3.append(perm)
+
+    if len(distance4) == 0:
+        print(' Found no distance four permutations of the ladder. ')
+
+    if distance3:
+        print('Distance 3 single curves: ')
+        for curve in distance3:
+            print('top   : ', curve.ladder[0])
+            print('bottom: ', curve.ladder[1])
+    if distance4:
+        print('Distance 4+ single curves: ')
+        for curve in distance4:
+            print('top   : ', curve.ladder[0])
+            print('bottom: ', curve.ladder[1])
+
+    return distance4
 
 
 def test_perms(original_ladder):
