@@ -40,3 +40,12 @@
   - **Rigid Expansions Visualization**: Integrated visualization of curve neighborhoods and rigid expansions based on Aramayona and Leininger (2014) and the particularly visual-amenable work of **Jesus Hernandez Hernandez (arXiv:1611.08010)**.
   - Parallelization of computations to improve runtime efficiency.
   - Long-term goal: Implement the full "Efficient Geodesic Algorithm" (EGA) to bypass the current exponential barrier in graph search complexity.
+
+## 7. Phase 2 Implementation (GUI & Visualization)
+- **GUI Application**: Created `micc/gui.py` using **PyQt6**. It features a modern interface that seamlessly integrates `MiccCore` for executing distance and genus computations, replacing the legacy CLI prompts with intuitive input fields and a built-in console.
+- **Advanced Curve Visualization**: Integrated **Matplotlib** canvases into the GUI to render mathematical structures:
+  - **Fundamental Domain**: Draws a $4g$-gon representing the surface, complete with boundary edge labeling ($a_i, b_i$) and interior curve arcs.
+  - **Surface embedded in $\mathbb{R}^3$**: Generates a 3D topological model (approximated currently via Torus manifolds) using `Axes3D`.
+  - **Handlebody Model**: Renders a 3D wireframe mesh capturing the structural genus handles.
+- **Rigid Expansion Visualization**: Implemented a directed, multi-partite graph using **NetworkX** to conceptualize the exhaustion of the curve complex via rigid expansions (Hernandez Hernandez, 2019). It visually maps the base "seed" principal set ($Y^0$) and subsequent generation layers ($Y^1, Y^2$) of uniquely determined curves.
+- **Parallelization**: Replaced the sequential `CurvePair` evaluation in `test_permutations` with parallelized processing using Python's `concurrent.futures.ProcessPoolExecutor`. This fully utilizes multi-core CPUs, drastically improving runtime when exploring large numbers of possible curve permutations.
