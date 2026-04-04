@@ -1,0 +1,39 @@
+\begin{picture}(0,0)%
+\includegraphics{ModifiedChainClaim2.pdf}%
+\end{picture}%
+\setlength{\unitlength}{3947sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(10577,2724)(211,-5023)
+\put(9826,-3286){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2g}$}%
+}}}}
+\put(4426,-3586){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2l}$}%
+}}}}
+\put(4201,-4186){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{3}$}%
+}}}}
+\put(2551,-3586){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2}$}%
+}}}}
+\put(2251,-4261){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{1}$}%
+}}}}
+\put(226,-2611){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$C_{2}$}%
+}}}}
+\put(6151,-4111){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2l+1}$}%
+}}}}
+\put(5551,-4561){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$[\alpha_{0},\ldots,\alpha_{2l}]^{-}$}%
+}}}}
+\put(5626,-2911){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$[\alpha_{2},\ldots,\alpha_{2l+2}]^{+}$}%
+}}}}
+\put(7951,-3286){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2l+4}$}%
+}}}}
+\put(9301,-4336){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2g-1}$}%
+}}}}
+\put(8926,-2761){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2g+1}$}%
+}}}}
+\put(7876,-4186){\makebox(0,0)[lb]{\smash{{\SetFigFont{20}{24.0}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\alpha_{2l+3}$}%
+}}}}
+\end{picture}%

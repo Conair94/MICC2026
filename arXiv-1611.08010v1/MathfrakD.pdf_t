@@ -1,0 +1,19 @@
+\begin{picture}(0,0)%
+\includegraphics{MathfrakD.pdf}%
+\end{picture}%
+\setlength{\unitlength}{3947sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(9124,2724)(314,-5023)
+\put(1201,-4186){\makebox(0,0)[lb]{\smash{{\SetFigFont{14}{16.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,1}$\epsilon^{1, \hspace{0.05cm} 4}$}%
+}}}}
+\put(5101,-2836){\makebox(0,0)[lb]{\smash{{\SetFigFont{14}{16.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\epsilon_{2}^{(1,n-1)}$}%
+}}}}
+\put(1201,-3286){\makebox(0,0)[lb]{\smash{{\SetFigFont{14}{16.8}{\familydefault}{\mddefault}{\updefault}{\color[rgb]{1,0,0}$\epsilon^{0, \hspace{0.05cm} 2}$}%
+}}}}
+\end{picture}%
