@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import Axes3D
+import networkx as nx
 
 # Import MiccCore to handle the backend logic
 from micc.cli import MiccCore
@@ -288,15 +289,58 @@ class MiccGUI(QMainWindow):
         ax.axis('off')
         self.handlebody_canvas.draw()
 
+    def draw_rigid_expansions(self):
+        ax = self.neighborhoods_canvas.axes
+        ax.clear()
+        if not self.core.curve:
+            self.neighborhoods_canvas.draw()
+            return
+
+        genus = int(self.core.get_genus() or 1)
+        G = nx.DiGraph()
+        
+        # Y^0 (Base Rigid Set)
+        seed_nodes = [f"a_{i}" for i in range(1, 2*genus + 3)] 
+        for node in seed_nodes:
+            G.add_node(node, layer=0)
+            
+        # Y^1 (1st Expansion: uniquely determined curves)
+        y1_nodes = [f"b_{i}" for i in range(1, genus + 2)]
+        for node in y1_nodes:
+            G.add_node(node, layer=1)
+            # Add abstract links representing "uniquely determined by"
+            for sn in np.random.choice(seed_nodes, 3, replace=False):
+                G.add_edge(sn, node)
+                
+        # Y^2 (2nd Expansion)
+        y2_nodes = [f"c_{i}" for i in range(1, genus * 2)]
+        for node in y2_nodes:
+            G.add_node(node, layer=2)
+            for yn in np.random.choice(y1_nodes + seed_nodes, 3, replace=False):
+                G.add_edge(yn, node)
+
+        pos = nx.multipartite_layout(G, subset_key="layer")
+        
+        # Draw Nodes
+        nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=seed_nodes, node_color='lightblue', label="Y^0 (Principal Set)")
+        nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=y1_nodes, node_color='lightgreen', label="Y^1 (1st Expansion)")
+        nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=y2_nodes, node_color='lightcoral', label="Y^2 (2nd Expansion)")
+        
+        # Draw Edges and Labels
+        nx.draw_networkx_edges(G, pos, ax=ax, alpha=0.3, arrows=True)
+        nx.draw_networkx_labels(G, pos, ax=ax, font_size=8)
+        
+        ax.set_title("Exhaustion via Rigid Expansions\n(Conceptual Graph based on Hernandez 2019)")
+        ax.legend(loc='lower right', fontsize=8)
+        ax.axis('off')
+        self.neighborhoods_canvas.draw()
+
     def update_visualizations(self):
         self.print_to_console("Updating visualizations...")
         self.draw_fundamental_domain()
         self.draw_3d_surface()
         self.draw_handlebody()
-        
-        self.neighborhoods_canvas.axes.clear()
-        self.neighborhoods_canvas.axes.text(0.5, 0.5, "Rigid Expansions\n(Based on Hernandez 2016)", ha='center', va='center')
-        self.neighborhoods_canvas.draw()
+        self.draw_rigid_expansions()
 
 def main():
     app = QApplication(sys.argv)
