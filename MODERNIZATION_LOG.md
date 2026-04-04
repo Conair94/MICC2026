@@ -31,3 +31,11 @@
 ## 5. Verification
 - **Test Suite**: 20/20 tests passed using `pytest`.
 - **Performance**: Native DFS execution removes the overhead of JSON serialization and file I/O.
+
+## 6. Next Phase Planning
+- **Document Creation**: Created `future-features-plan.md` to track the next phase.
+- **Features Planned**: 
+  - Application with a real GUI (PyQt6/PySide6).
+  - Visualization of curves via topological models (Fundamental Domain, Surface in R^3, Handlebody Model).
+  - Parallelization of computations to improve runtime efficiency.
+  - Long-term goal: Implement the full "Efficient Geodesic Algorithm" (EGA) to bypass the current exponential barrier in graph search complexity.
