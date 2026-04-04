@@ -1,8 +1,6 @@
-from __future__ import absolute_import
 import multiprocessing as mp
-from .graph import shift
+from graph import shift
 from time import sleep
-from six.moves import range
 
 def count(adj_node, adj_list):
     return adj_list.count(adj_node)
@@ -46,7 +44,7 @@ def dfs_partial( current_node,  start_node,  graph,  current_path,  nodes_to_fac
     if current_node == start_node:
         return [shift(list(current_path))]
 
-    if len(current_path) >= list(graph.keys())/4:
+    if len(current_path) >= graph.keys()/4:
         return  [('work', current_node,  start_node,  graph,  current_path,  nodes_to_faces)]
 
     else:

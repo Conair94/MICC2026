@@ -1,10 +1,6 @@
-from __future__ import absolute_import
-from __future__ import print_function
 from copy import deepcopy
-from . import curves as c
+import curves as c
 from sys import stderr
-import six
-from six.moves import range
 #from micc.cgraph import cdfs
 
 
@@ -26,9 +22,9 @@ def invert(path):
 
 
 def contains(small, big):
-    print(type(small), type(big))
-    for i in range(len(big)-len(small)+1):
-        for j in range(len(small)):
+    print type(small), type(big)
+    for i in xrange(len(big)-len(small)+1):
+        for j in xrange(len(small)):
             if big[i+j] != small[j]:
                 break
         else:
@@ -55,14 +51,14 @@ class Graph:
         edges = self.edges[0]
         fourgons = [i[1] for i in edges if i[0] == 4]
         non_fourgons = [i[1] for i in edges if i[0] != 4]
-        keys = list(self.nodes_to_faces.keys())
+        keys = self.nodes_to_faces.keys()
         for i,face in enumerate(non_fourgons):
             for node in face:
                 if not node in keys:
                     self.nodes_to_faces[node] = [i]
                 else:
                     self.nodes_to_faces[node].append(i)
-                keys = list(self.nodes_to_faces.keys())
+                keys = self.nodes_to_faces.keys()
         for face in fourgons:
             for node in face:
                 if not node in keys:
@@ -70,9 +66,9 @@ class Graph:
                 else:
                     self.nodes_to_faces[node].append(None)
 
-                keys = list(self.nodes_to_faces.keys())
-        self.nodes_to_faces = {int(k): tuple(v) for k,v in six.iteritems(self.nodes_to_faces)}
-        nodes = list(range(n))
+                keys = self.nodes_to_faces.keys()
+        self.nodes_to_faces = {int(k): tuple(v) for k,v in self.nodes_to_faces.iteritems()}
+        nodes = range(n)
 
         for i in nodes:
             self.add_node(i)
@@ -127,7 +123,7 @@ class Graph:
                 temp_path = shift(temp_path)
                 for face in non_fourgons:
                     for triple in [temp_path[i:i+3] \
-                            for i in range(temp_len-2)]:
+                            for i in xrange(temp_len-2)]:
                         if set(triple) <= face:
                             if not removed:
                                 self.loops.remove(path)
@@ -140,16 +136,16 @@ class Graph:
                     temp_path = invert(temp_path)
 
                     for triple in [temp_path[i:i+3] \
-                            for i in range(temp_len-2)]:
+                            for i in xrange(temp_len-2)]:
                         if set(triple) <= face:
                             if not removed:
                                 self.loops.remove(path)
                                 removed = True
                                 break
 
-                    for i in range(temp_len):
+                    for i in xrange(temp_len):
                         temp_path = temp_path[1:] + temp_path[:1]
-                        for triple in (temp_path[i:i+3] for i in range(temp_len-2)):
+                        for triple in (temp_path[i:i+3] for i in xrange(temp_len-2)):
                             boolA = set(triple) <= face
 
                             #boolA = contains(triple,face)

@@ -1,13 +1,11 @@
-from __future__ import absolute_import
-from __future__ import print_function
 from copy import deepcopy
-from sys import maxsize
+from sys import maxint
 index = 0
 
 class Johnson:
 
     def __init__(self, graph):
-        self.n = len(list(graph.keys()))
+        self.n = len(graph.keys())
         self.k = 0
         self.graph = graph
         self.circuits = []
@@ -15,7 +13,7 @@ class Johnson:
         self.blocked_nodes = {}
 
     def circuit(self, subgraph, v, s, stack):
-        if len(list(subgraph.keys())) is 0:
+        if len(subgraph.keys()) is 0:
             return False
 
         f = False
@@ -137,7 +135,7 @@ class Johnson:
         while s < self.n:
             subgraph = Johnson.subgraph_from_vertex(s, self.graph)
             least_scc = Johnson.least_scc(subgraph)
-            if len(list(least_scc.keys())) > 0:
+            if len(least_scc.keys()) > 0:
                 s = Johnson.least_vertex(least_scc)
                 for i in least_scc.keys():
                     self.blocked[i] = False
@@ -157,4 +155,4 @@ if __name__ == '__main__':
     })
 
     j.find_all_circuits()
-    print(j.circuits)
+    print j.circuits

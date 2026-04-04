@@ -5,10 +5,7 @@ Usage:
     python setup.py py2app
 """
 
-from __future__ import absolute_import
-from setuptools import setup, Extension
-from pybind11.setup_helpers import Pybind11Extension, build_ext
-
+from setuptools import setup
 '''
 from sys import setrecursionlimit
 setrecursionlimit(10000)
@@ -24,13 +21,6 @@ setup(
 )
 '''
 
-ext_modules = [
-    Pybind11Extension(
-        "_micc_dfs",
-        ["micc/dfs_module.cpp"],
-    ),
-]
-
 setup(name='MICC',
       version='0.1.3',
       author='Matt Morse, Paul Glenn',
@@ -41,12 +31,9 @@ setup(name='MICC',
       license='LICENSE',
       description='An implementation of the Birman-Margalit-Menasco Theorem, to be used in a experimental, exploratory manner.',
       long_description=open('README.rst').read(),
-      ext_modules=ext_modules,
-      cmdclass={"build_ext": build_ext},
       install_requires=[
-          "numpy",
-          "six",
-          "pybind11"
+          "numpy== 1.9.1",
+          "nose >= 1.3.1",
+          "rednose"
       ],
-      tests_require=["pytest"],
-      test_suite="pytest")
+      test_suite="nose.collector")

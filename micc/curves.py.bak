@@ -1,13 +1,8 @@
 # Give curve pairs class structure in preparation for public access
-from __future__ import absolute_import
-from __future__ import print_function
 import numpy as np
-from itertools import product
+from itertools import product, izip
 from copy import deepcopy
 import re
-import six
-from six.moves import zip
-from six.moves import range
 
 def fix_matrix_signs(M):
     '''
@@ -34,7 +29,7 @@ def fix_matrix_signs(M):
             g_val = int(M[0, row, col])
             new = np.array(np.where(M[0, g_val, :] == row))
             #print  np.where(new%2==col%2)
-            ind = int(new[np.where(new % 2 == col % 2)][0])
+            ind = int(new[np.where(new % 2 == col % 2)])
             sgn = -sgn
             M[1, g_val, ind] = sgn
             ind += 2
@@ -316,7 +311,7 @@ def build_matrices(edge_paths, all_paths):
     for path in all_paths:
         ordered_path = list(np.sort(path))
         ordered_paths.append(ordered_path)
-        mapped_paths.append(dict(zip(ordered_path,list(range(len(path))))))
+        mapped_paths.append(dict(zip(ordered_path,range(len(path)))))
     #print mapped_paths,'\n'
     #Create Matrices using details from edge paths.
     for Path, mapped_path in zip(all_paths, mapped_paths):
@@ -326,8 +321,8 @@ def build_matrices(edge_paths, all_paths):
         last = Path[len(Path)-1]
         M = np.zeros(shape)
         M2 = np.zeros(shape)
-        M[:, 0] = np.array([path_size-1]+list(range(path_size-1)))
-        M[:, 2] = np.array(list(range(1,path_size))+[0])
+        M[:, 0] = np.array([path_size-1]+range(path_size-1))
+        M[:, 2] = np.array(range(1,path_size)+[0])
         past_edges = dict()
         future_edges = dict()
         old_vertex = last
@@ -439,7 +434,7 @@ def find_combined_paths(all_paths, M_library):
     :returns:
     '''
     list_of_connected = []
-    path_library = dict(zip(list(range(len(all_paths))), all_paths))
+    path_library = dict(zip(range(len(all_paths)), all_paths))
     index1 = 0
     for path1 in all_paths:
         index2 = 0
@@ -492,7 +487,7 @@ def edges(M):
     # Bigons are unwanted structures.
     Paths = []  # alpha - edge paths.
     facesTemp = dict()
-    for i,j in product(list(range(num_rows)),list(range(num_cols))):
+    for i,j in product(range(num_rows),range(num_cols)):
         #Set of edges associated with face
         tr = 1
         face = set()
@@ -523,7 +518,7 @@ def edges(M):
             #new = np.intersect1d(arr1[0],arr2[0],assume_unique=True)
             #ENS: val and sign correct
             ind = np.where(new%2==j%2) #ENS: beta->beta, alpha->alpha
-            j_next = (int(new[ind][0])+1)%num_cols #Always move clockwise
+            j_next = (int(new[ind])+1)%num_cols #Always move clockwise
             j_old = j
             j = j_next
             if (i,j) in old_vertices:
@@ -573,7 +568,7 @@ def boundary_count(M):
     oldEdges = [ ] ##list of previous edge paths
     bigonFlag =0
 
-    for i,j in product(list(range(numrows)),list(range(numcols))):
+    for i,j in product(range(numrows),range(numcols)):
         # upper bound on possible no. faces is number of vertices
         if faces==numrows: break
 
@@ -597,7 +592,7 @@ def boundary_count(M):
             ind = np.where(new%2==j%2)
             #ENS: beta->beta, alpha->alpha
 
-            j = (int(new[ind][0])+1)%numcols
+            j = (int(new[ind])+1)%numcols
             #Always move clockwise - to next edge
 
             if (i,j) in oldEdges: break
@@ -619,7 +614,7 @@ def vector_solution(edges):
     solution = dict()
 
     for face in edges:
-        if face[0] not in list(solution.keys()):
+        if face[0] not in solution.keys():
             solution[face[0]] = 1
         else:
             solution[face[0]] += 1
@@ -641,7 +636,7 @@ def genus(M, euler=0, boundaries = 0):
     '''
     V = M.shape[1] # vertices
     P, bigon = boundary_count(M)  # Polygons in the complement of curve pair
-    #if bigon == 1: P -= 1 # pull away one bigon
+    #if bigon is 1: P -= 1 # pull away one bigon
     #Euler characteristic (since edges = 2*vertices) is P - V
     # originally X = V-E+P
     X = P-V+boundaries
@@ -903,7 +898,7 @@ def test_permutations(original_ladder):
             else:
                 perm = None
             if not perm is None :
-                if perm.distance == 4:
+                if perm.distance is 4:
                     distance4.append(deepcopy(perm))
                 else:
                     distance3.append(deepcopy(perm))
@@ -912,22 +907,22 @@ def test_permutations(original_ladder):
             ladder[0].append(first_vertex)
 
         if len(distance4) == 0:
-            print(' Found no distance four permutations of the ladder. ')
+            print ' Found no distance four permutations of the ladder. '
 
         if distance3:
-            print('Distance 3 single curves: ')
+            print 'Distance 3 single curves: '
             for curve in distance3:
-                print('top   : ', curve.ladder[0])
-                print('bottom: ', curve.ladder[1])
+                print 'top   : ', curve.ladder[0]
+                print 'bottom: ', curve.ladder[1]
         if distance4:
-            print('Distance 4+ single curves: ')
+            print 'Distance 4+ single curves: '
             for curve in distance4:
-                print('top   : ', curve.ladder[0])
-                print('bottom: ', curve.ladder[1])
+                print 'top   : ', curve.ladder[0]
+                print 'bottom: ', curve.ladder[1]
 
         return distance4
     else:
-        print("You didn't give me a ladder! ")
+        print "You didn't give me a ladder! "
         return []
 
 
@@ -943,7 +938,7 @@ def test_perms(original_ladder):
             else:
                 perm = None
             if not perm is None :
-                if not perm.distance == 3:
+                if not perm.distance is 3:
                     distance4.append(perm)
                 else:
                     distance3.append(perm)
@@ -1063,7 +1058,7 @@ def cycle_to_ladder(cycle_rep):
 
 #import numpy as np
 #from curves import fix_matrix_signs, boundary_count, genus, ladder_convert, vector_solution, edges, Three
-from .graph import Graph
+from graph import Graph
 
 
 class CurvePair:
@@ -1103,9 +1098,9 @@ class CurvePair:
         self.n = len(self.top)
 
         self.matrix = np.zeros((2,self.n,4))
-        self.matrix[0,:,0] = [self.n-1] + list(range(self.n-1))
+        self.matrix[0,:,0] = [self.n-1] + range(self.n-1)
         self.matrix[0,:,1] = self.top
-        self.matrix[0,:,2] = list(range(1,self.n)) +[0]
+        self.matrix[0,:,2] = range(1,self.n) +[0]
         self.matrix[0,:,3] = self.bottom
 
         self.matrix = fix_matrix_signs(self.matrix)
@@ -1125,7 +1120,7 @@ class CurvePair:
     @property
     def distance(self):
         if self.computed_distance == False:
-            if self.dist == 1:
+            if self.dist is 1:
                 graph = Graph(self.edges, rep_num=self.conjectured_dist-2)
                 graph.compute_loops(self.n, self.genus)
                 self.loops = graph.gammas
@@ -1164,7 +1159,7 @@ class CurvePair:
         else:
             if recursive:
                 geodesic_distances = []
-                for k, matrix in six.iteritems(lib):
+                for k, matrix in lib.iteritems():
                     #stderr.write(str(matrix))
                     if np.array_equal(matrix, self.matrix):
                         continue
@@ -1173,13 +1168,10 @@ class CurvePair:
                         continue
                     cc = CurvePair(matrix[0, :, 1], matrix[0, :, 3])
                     #stderr.write(str(k)+": "+str(cc.distance)+'\n')
-                    d = cc.distance
-                    if isinstance(d, str):
-                        d = float('inf')
-                    geodesic_distances.append(d)
+                    geodesic_distances.append(cc.distance)
                     #print 'computed curve',k,'!'
                 #print '\n'
-                return int(min(set(geodesic_distances))) + 1, lib
+                return min(set(geodesic_distances)) + 1, lib
             else:
                 return dist, lib
 

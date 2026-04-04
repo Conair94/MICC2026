@@ -1,152 +1,180 @@
 #!/usr/bin/env python
-import curves as c
-from curves import CurvePair, cycle_to_ladder, ladder_to_cycle
+from __future__ import absolute_import
+from __future__ import print_function
+from . import curves as c
+from .curves import CurvePair, cycle_to_ladder, ladder_to_cycle
 import readline
+import sys
+from six.moves import range
+from six.moves import zip
+from six.moves import input
 
-class CLI:
-
-    perm_dict = {}
-
+class MiccCore:
+    """Headless core logic for MICC, decoupled from terminal I/O."""
+    
     def __init__(self):
-        self.commands = {
-                'genus':self.get_genus,
-                'faces':self.get_faces,
-                'perm':self.get_perms,
-                'distance':self.get_distance,
-                'curves':self.get_curves,
-                'matrix':self.get_matrix,
-                'help':self.get_help,
-                'change':self.run,
-                'exit':self.quit,
-                'quit':self.quit,
-                'bye':self.quit
-                }
-
-        self.perms = dict()
+        self.curve = None
         self.ladder = []
+        self.perms = {}
 
-    def is_multi(self,topRow,bottomRow):
-        if 0 in topRow or 0 in bottomRow:
-            multi = c.matrix_is_multicurve([topRow, bottomRow])
+    def set_curve_from_ladder(self, top, bottom):
+        """Sets the current curve pair from ladder identifications."""
+        if self.is_multicurve(top, bottom):
+            self.ladder = [top, bottom]
+            self.curve = None
+            return False, "Multicurve detected"
         else:
-            multi  = c.ladder_is_multicurve(topRow, bottomRow)
-        return multi
+            self.curve = CurvePair(top, bottom)
+            self.ladder = [top, bottom]
+            return True, "Curve pair set"
 
-    def correct_input(self,ladder):
-        while ' ' in ladder: ladder.remove(' ')
-        while  '' in ladder: ladder.remove('')
-        for string in ladder:
-            string = list(string)
-            while ' ' in string: string.remove(' ')
-            string = str(string)
+    def set_curve_from_cycle(self, cycle_str):
+        """Sets the current curve pair from a cycle string."""
+        ladder = cycle_to_ladder(cycle_str)
+        return self.set_curve_from_ladder(ladder[0], ladder[1])
 
-        return ladder
+    def is_multicurve(self, top, bottom):
+        if 0 in top or 0 in bottom:
+            return c.matrix_is_multicurve([top, bottom])
+        else:
+            return c.ladder_is_multicurve(top, bottom)
 
-    def made_mistake(self,top, bottom):
+    def get_genus(self):
+        if not self.curve: return None
+        return self.curve.genus
 
-        if len(top) == 0 or len(bottom) == 0: return True
+    def get_boundaries(self):
+        if not self.curve: return None
+        return self.curve.boundaries
 
-        indices =  dict(zip(set(top+bottom), 2*len(top)*[0]))
+    def get_solution(self):
+        if not self.curve: return None
+        return self.curve.solution
+
+    def get_distance(self):
+        if not self.curve: return None
+        return self.curve.distance
+
+    def get_loops(self):
+        if not self.curve: return None
+        return self.curve.loops
+
+    def get_loop_matrices(self):
+        if not self.curve: return None
+        return self.curve.loop_matrices
+
+    def get_permutations(self):
+        """Returns permutations of the current curve or ladder."""
+        source = self.curve.ladder if self.curve else self.ladder
+        perms_list = c.test_permutations(source)
+        self.perms = {i+1: p for i, p in enumerate(perms_list)}
+        return self.perms
+
+    @staticmethod
+    def validate_input(top, bottom):
+        if len(top) == 0 or len(bottom) == 0: return False
+        if len(top) != len(bottom): return False
+        
+        indices = dict(zip(set(top + bottom), 2 * len(top) * [0]))
         for val in top:
             indices[val] += 1
         for val in bottom:
             indices[val] += 1
-        tooMany = [ x != 2 for x in indices.values() ]
+        
+        return all(x == 2 for x in indices.values())
 
-        if not True in tooMany and len(top) != len(bottom):
-            return True
+class CLI:
+    """Terminal-based UI for MICC."""
 
-        return True in tooMany
+    def __init__(self, core=None):
+        self.core = core or MiccCore()
+        self.commands = {
+            'genus': self.ui_get_genus,
+            'faces': self.ui_get_faces,
+            'perm': self.ui_get_perms,
+            'distance': self.ui_get_distance,
+            'curves': self.ui_get_curves,
+            'matrix': self.ui_get_matrix,
+            'help': self.ui_get_help,
+            'change': self.ui_change,
+            'exit': self.quit,
+            'quit': self.quit,
+            'bye': self.quit
+        }
 
-    def process_input(self):
-        valid_input = False
-        ret = False
-        while not valid_input:
-            input = raw_input("What would you like to calculate? ")
-            if input in self.commands.keys():
-                ret = self.commands[input]()
-                valid_input = True
-            else:
-                raw_input("Sorry, I didn't quite catch that. Press enter and try again. ")
-        return ret
+    def correct_input(self, ladder):
+        ladder = [s.strip() for s in ladder if s.strip()]
+        return [int(num) for num in ladder]
 
-
-
-    def quit(self):
-        quit()
-
-
-    def get_genus(self):
-        print "Genus: ",self.curve.genus
+    def ui_get_genus(self):
+        genus = self.core.get_genus()
+        if genus is not None:
+            print("Genus: ", genus)
+        else:
+            print("No curve loaded.")
         return False
 
-    def get_faces(self):
-        curve = self.curve
-        print '%s faces  with %s bigons'%tuple(curve.boundaries)
-        print 'Vector solution: ', self.curve.solution
-        for face in curve.edges[0]:
-            print tuple(face[1])
+    def ui_get_faces(self):
+        bdy = self.core.get_boundaries()
+        sol = self.core.get_solution()
+        if bdy and self.core.curve:
+            print('%s faces with %s bigons' % tuple(bdy))
+            print('Vector solution: ', sol)
+            for face in self.core.curve.edges[0]:
+                print(tuple(face[1]))
+        else:
+            print("No curve loaded.")
         return False
 
-    def get_distance(self):
-        print 'Distance: ', self.curve.distance
+    def ui_get_distance(self):
+        dist = self.core.get_distance()
+        if dist is not None:
+            print('Distance: ', dist)
+        else:
+            print("No curve loaded.")
         return False
 
-    def shear(self):
-        self.perms = dict()
-        for index, perm in enumerate(c.test_permutations(self.ladder),start=1):
-            self.perms[index] = perm
-            print '\n'
-            print 'Curve', index, ' Distance: ', perm.distance
-            print perm.ladder[0]
-            print perm.ladder[1]
-        if raw_input('would you like to keep going? ') == 'no': quit()
+    def ui_get_perms(self):
+        perms = self.core.get_permutations()
+        if not perms:
+            print("No permutations found or no ladder loaded.")
+            return False
+        for index, perm in perms.items():
+            print('\nCurve %d Distance: %s' % (index, perm.distance))
+            print(perm.ladder[0])
+            print(perm.ladder[1])
         return False
 
-
-    def get_perms(self):
-        self.perms = dict()
-
-        for index, perm in enumerate(c.test_permutations(self.curve.ladder),start=1):
-            self.perms[index] = perm
-            print '\n'
-            print 'Curve', index, ' Distance: ', perm.distance
-            print perm.ladder[0]
-            print perm.ladder[1]
-        return False
-
-    def get_curves(self):
-        view = raw_input("Would you like to view the vertex paths,"+\
-                                    " the corresponding matrices, or both? ")
-
-        for itr in range(len(self.curve.loops)):
-
-            loop = self.curve.loops[itr]
-            matrix = self.curve.loop_matrices.values()[itr]
+    def ui_get_curves(self):
+        if not self.core.curve:
+            print("No curve loaded.")
+            return False
+            
+        view = input("Would you like to view the vertex paths, the corresponding matrices, or both? ")
+        loops = self.core.get_loops()
+        matrices = self.core.get_loop_matrices()
+        
+        for itr in range(len(loops)):
+            loop = loops[itr]
+            matrix = list(matrices.values())[itr]
             Genus = c.genus(matrix)
 
-            if view=='paths' or view=='both':
-                print 'Path', loop
-
-            if view=='matrices' or view== 'both':
-                print 'Matrix: \n',matrix[0]
-
-            print 'Curve genus: ', Genus,'\n'
+            if view in ['paths', 'both']:
+                print('Path', loop)
+            if view in ['matrices', 'both']:
+                print('Matrix: \n', matrix[0])
+            print('Curve genus: ', Genus, '\n')
         return False
 
-    def get_matrix(self):
-        print self.curve.matrix
+    def ui_get_matrix(self):
+        if self.core.curve:
+            print(self.core.curve.matrix)
+        else:
+            print("No curve loaded.")
         return False
 
-    def clear(self):
-        self.perms = dict()
-        self.curve = None
-        self.topRow = []
-        self.bottomRow = []
-        return False
-
-    def get_help(self):
-        print ''' Welcome to curvePair.
+    def ui_get_help(self):
+        print(''' Welcome to curvePair.
         \n With this program, by supplying a pair of curves you can determine:
         \n 1. The genus of the surface on which the curves fill (say 'genus')
         \n 2. The number of boundary components in the complement of the curve pair on such a surface , and the vector solution (say 'faces')
@@ -173,73 +201,79 @@ class CLI:
         \n ------------------ end help ----------------------
 
         \n Note: say 'done' to exit
-        '''
-
+        ''')
         return False
 
-
-    def run(self):
-        self.clear()
-        self.get_help()
-        cycle_or_ladder = raw_input('Would you like to describe curves as a ladder or a cycle?\n (Type \'cycle\' or \'ladder\'): ')
-
+    def ui_change(self):
+        cycle_or_ladder = input('Would you like to describe curves as a ladder or a cycle?\n (Type \'cycle\' or \'ladder\'): ')
+        
         valid = False
-        valid_exit_status = None
         while not valid:
             if cycle_or_ladder == 'ladder':
-                self.topRow = raw_input('Input top indentifications: ')
-                if self.topRow == 'exit' or self.topRow == 'quit': quit()
-                self.topRow = self.topRow.split(',')
-                self.topRow = self.correct_input(self.topRow)
-                self.topRow = [int(num) for num in self.topRow]
-
-                self.bottomRow = raw_input('Input bottom indentifications: ')
-                self.bottomRow = self.bottomRow.split(',')
-                self.bottomRow = self.correct_input(self.bottomRow)
-                self.bottomRow = [int(num) for num in self.bottomRow]
-
-                print 'Input (as a cycle):'
-                print ladder_to_cycle(self.topRow, self.bottomRow)
-                print 'Input (as a ladder): '
-                print self.topRow
-                print self.bottomRow
-                valid = not self.made_mistake(self.topRow,self.bottomRow)
-
-                if not valid:
-                    print "There seems to be an error in your entry. Please try again. "
-            if cycle_or_ladder == 'cycle':
-                cycle = raw_input('Input cycle: ')
-                print 'Input (as a cycle):'
-                print cycle
+                top_str = input('Input top identifications: ')
+                if top_str.lower() in ['exit', 'quit']: sys.exit()
+                top = self.correct_input(top_str.split(','))
+                
+                bottom_str = input('Input bottom identifications: ')
+                bottom = self.correct_input(bottom_str.split(','))
+                
+                if not self.core.validate_input(top, bottom):
+                    print("There seems to be an error in your entry. Please try again.")
+                    continue
+                
+                print('Input (as a cycle):', ladder_to_cycle(top, bottom))
+                print('Input (as a ladder):\n', top, '\n', bottom)
+                
+                success, msg = self.core.set_curve_from_ladder(top, bottom)
+                valid = True
+                
+            elif cycle_or_ladder == 'cycle':
+                cycle = input('Input cycle: ')
+                print('Input (as a cycle):', cycle)
                 ladder = cycle_to_ladder(cycle)
-                self.topRow = ladder[0]
-                self.bottomRow = ladder[1]
-                print 'Input (as a ladder):'
-                print self.topRow
-                print self.bottomRow
-                valid = not self.made_mistake(self.topRow,self.bottomRow)
-                if not valid:
-                    print "There seems to be an error in your entry. Please try again. "
+                print('Input (as a ladder):\n', ladder[0], '\n', ladder[1])
+                
+                if not self.core.validate_input(ladder[0], ladder[1]):
+                    print("There seems to be an error in your entry. Please try again.")
+                    continue
+                    
+                success, msg = self.core.set_curve_from_cycle(cycle)
+                valid = True
+            else:
+                cycle_or_ladder = input('Please type \'cycle\' or \'ladder\': ')
 
-        if not self.is_multi(self.topRow, self.bottomRow):
-                self.curve = CurvePair(self.topRow, self.bottomRow)
-                print 'Note: if you permute a curve with \'perm\', the sheared curves will be lost.'
-
+        if not success: # Multicurve
+            ans = input('Would you like to shear this multicurve? ')
+            if ans.lower() == 'yes':
+                self.ui_get_perms()
+                self.ui_change()
+            else:
+                print('Better luck next time.')
+                sys.exit()
         else:
-            self.ladder = [self.topRow, self.bottomRow]
-            ans = raw_input('Would you like to shear this multicurve? ')
-            while ans != 'yes' and ans != 'no':
-                ans = raw_input('I didn\'t understand. Would you like to shear this multicurve? ')
-            if ans == 'yes':
-                self.shear()
-                self.run()
-            elif ans == 'no':
-                print 'Better luck next time. '
-                quit()
+            print('Note: if you permute a curve with \'perm\', the sheared curves will be lost.')
+        
+        return False
 
-        while not valid_exit_status:
-             valid_exit_status = self.process_input()
+    def process_input(self):
+        while True:
+            cmd = input("What would you like to calculate? ").strip().lower()
+            if cmd in ['done', 'exit', 'quit']:
+                return True
+            if cmd in self.commands:
+                return self.commands[cmd]()
+            else:
+                input("Sorry, I didn't quite catch that. Press enter and try again. ")
 
-        return True
+    def quit(self):
+        sys.exit()
 
-CLI().run()
+    def run(self):
+        self.ui_get_help()
+        self.ui_change()
+        exit_status = False
+        while not exit_status:
+            exit_status = self.process_input()
+
+if __name__ == "__main__":
+    CLI().run()
