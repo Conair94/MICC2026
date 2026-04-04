@@ -25,3 +25,11 @@ This document outlines the planned features and improvements for the next phase 
   - Implement intersection bound pruning ($|\alpha_1 \cap \gamma| \leq d-1$) to efficiently generate candidates for the next geodesic step.
   - Expand support to systematically determine distances $d > 4$.
   - Implement complexity-reducing "surgery" operations for non-efficient geodesics, replacing the current exponential exhaustive search with the effective finite search.
+
+## 5. Curve Neighborhoods and Rigid Expansions
+- **Goal:** Visualize neighborhoods of curves to explore the exhaustion of the curve complex via rigid sets.
+- **Concept:** Given a full multiset of curves (e.g., a filling set or a pants decomposition), visualize the family of curves that are "one away" (disjoint) from a sub-family of $n-1$ curves in the set.
+- **Significance:** This allows users to interactively study **rigid expansions** as described by Aramayona and Leininger (2014). By iteratively expanding the set of curves through these neighborhoods, the tool can simulate the finite exhaustion of the infinite curve complex.
+- **Visual implementation:**
+  - Highlight the sub-family of $n-1$ curves on the chosen topological model.
+  - Dynamically generate and overlay all possible disjoint curves (the link of the sub-family) that exist within the remaining sub-surface (e.g., a four-holed sphere or one-holed torus).

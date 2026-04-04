@@ -39,3 +39,4 @@
   - Visualization of curves via topological models (Fundamental Domain, Surface in R^3, Handlebody Model).
   - Parallelization of computations to improve runtime efficiency.
   - Long-term goal: Implement the full "Efficient Geodesic Algorithm" (EGA) to bypass the current exponential barrier in graph search complexity.
+  - **New Feature Added**: Added visualization of curve neighborhoods and rigid expansions based on Aramayona and Leininger (2014) to study the finite exhaustion of the infinite curve complex.
