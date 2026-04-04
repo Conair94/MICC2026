@@ -1,4 +1,5 @@
 import sys
+import os
 import numpy as np
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLabel, QLineEdit, QPushButton, QTextEdit, QTabWidget, QFormLayout,
@@ -10,8 +11,15 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import Axes3D
 import networkx as nx
 
-# Import MiccCore to handle the backend logic
-from micc.cli import MiccCore
+# Add parent directory to path to handle direct script execution
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from micc.cli import MiccCore
+    from micc.curves import cycle_to_ladder, ladder_to_cycle
+except ImportError:
+    from cli import MiccCore
+    from curves import cycle_to_ladder, ladder_to_cycle
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100, is_3d=False):
@@ -254,7 +262,6 @@ class MiccGUI(QMainWindow):
             genus = 1
             
         # Draw a simple Torus (Genus 1) as a placeholder for 3D surface
-        # For higher genus, we would draw multiple linked tori
         n = 100
         theta = np.linspace(0, 2.*np.pi, n)
         phi = np.linspace(0, 2.*np.pi, n)
@@ -277,8 +284,6 @@ class MiccGUI(QMainWindow):
             self.handlebody_canvas.draw()
             return
             
-        # A handlebody can be visualized as a 3D blob with holes
-        # Here we just draw a stylized sphere with points indicating "handles"
         u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
         x = np.cos(u)*np.sin(v)
         y = np.sin(u)*np.sin(v)
@@ -299,20 +304,16 @@ class MiccGUI(QMainWindow):
         genus = int(self.core.get_genus() or 1)
         G = nx.DiGraph()
         
-        # Y^0 (Base Rigid Set)
         seed_nodes = [f"a_{i}" for i in range(1, 2*genus + 3)] 
         for node in seed_nodes:
             G.add_node(node, layer=0)
             
-        # Y^1 (1st Expansion: uniquely determined curves)
         y1_nodes = [f"b_{i}" for i in range(1, genus + 2)]
         for node in y1_nodes:
             G.add_node(node, layer=1)
-            # Add abstract links representing "uniquely determined by"
             for sn in np.random.choice(seed_nodes, 3, replace=False):
                 G.add_edge(sn, node)
                 
-        # Y^2 (2nd Expansion)
         y2_nodes = [f"c_{i}" for i in range(1, genus * 2)]
         for node in y2_nodes:
             G.add_node(node, layer=2)
@@ -321,12 +322,10 @@ class MiccGUI(QMainWindow):
 
         pos = nx.multipartite_layout(G, subset_key="layer")
         
-        # Draw Nodes
         nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=seed_nodes, node_color='lightblue', label="Y^0 (Principal Set)")
         nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=y1_nodes, node_color='lightgreen', label="Y^1 (1st Expansion)")
         nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=y2_nodes, node_color='lightcoral', label="Y^2 (2nd Expansion)")
         
-        # Draw Edges and Labels
         nx.draw_networkx_edges(G, pos, ax=ax, alpha=0.3, arrows=True)
         nx.draw_networkx_labels(G, pos, ax=ax, font_size=8)
         
