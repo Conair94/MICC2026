@@ -210,11 +210,11 @@ class CLI:
         valid = False
         while not valid:
             if cycle_or_ladder == 'ladder':
-                top_str = input('Input top identifications: ')
+                top_str = input('Input top indentifications: ')
                 if top_str.lower() in ['exit', 'quit']: sys.exit()
                 top = self.correct_input(top_str.split(','))
                 
-                bottom_str = input('Input bottom identifications: ')
+                bottom_str = input('Input bottom indentifications: ')
                 bottom = self.correct_input(bottom_str.split(','))
                 
                 if not self.core.validate_input(top, bottom):

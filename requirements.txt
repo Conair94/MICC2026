@@ -3,4 +3,4 @@ numpy
 scipy
 python-termstyle
 six
-fissix
+pybind11
