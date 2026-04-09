@@ -9,7 +9,7 @@ Focused on visualizing strongly rigid finite seeds and their rigid expansions in
 
 ## Modern Tooling
 - **[curver](https://markcbell.co.uk/software.html#curver-software):** Efficient calculations in the curve complex.
-- **[flipper](https://markcbell.co.uk/software.html#flipper-software):** Dynamics of mapping classes and laminations on surfaces.
+- **[flipper](https://markcbell.co.uk/software.html#flipper-software):** Dynamics of mapping classes and laminations on surfaces. Use `python3 -m flipper.app` to launch the GUI for interactive curve depiction.
 
 ## Dependencies
 - `curver`
