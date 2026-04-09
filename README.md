@@ -18,10 +18,19 @@ Focused on visualizing strongly rigid finite seeds and their rigid expansions in
 - `matplotlib`
 - `scipy`
 
-## Installation
-```bash
-pip install -r requirements.txt
-```
+## Usage
 
-## Legacy Implementation
-Original project files have been archived in the `legacy/` directory.
+### Relational Structure GUI
+Launch the custom GUI to visualize intersection graphs of curve seeds:
+```bash
+python3 src/gui.py
+```
+- **Surface Selection:** Adjust Genus and Punctures.
+- **Curve Input:** Enter comma-separated curve names (e.g., `a_0, b_0, c_0`).
+- **Examples:** Click buttons like "Aramayona-Leininger (G3)" to load classic rigid seeds.
+
+### Surface Depiction
+Use `flipper`'s built-in GUI for high-quality surface rendering:
+```bash
+python3 -m flipper.app
+```
