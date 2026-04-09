@@ -55,7 +55,7 @@ class RigidSeedGUI:
         self.curve_input.insert(tk.END, "a_0, b_0, c_0")
 
         # Expansion Controls
-        exp_group = ttk.LabelFrame(left_pane, text="Rigid Expansion", padding="5")
+        exp_group = ttk.LabelFrame(left_pane, text="Rigid Expansion & Graph Style", padding="5")
         exp_group.pack(fill=tk.X, pady=(0, 10))
 
         ttk.Label(exp_group, text="Generations (n):").grid(row=0, column=0, sticky=tk.W)
@@ -63,11 +63,19 @@ class RigidSeedGUI:
         self.exp_gen_spin = ttk.Spinbox(exp_group, from_=1, to=5, textvariable=self.exp_gen_var, width=5)
         self.exp_gen_spin.grid(row=0, column=1, sticky=tk.W, pady=2)
 
+        ttk.Label(exp_group, text="Edge Type:").grid(row=1, column=0, sticky=tk.W)
+        self.edge_type_var = tk.StringVar(value="Disjoint (Curve Graph)")
+        self.edge_type_combo = ttk.Combobox(exp_group, textvariable=self.edge_type_var, 
+                                            values=["Disjoint (Curve Graph)", "Intersect (Intersection Graph)"],
+                                            state="readonly", width=22)
+        self.edge_type_combo.grid(row=1, column=1, pady=2, sticky=tk.W)
+        self.edge_type_combo.bind("<<ComboboxSelected>>", lambda e: self.visualize_expanded())
+
         self.compute_btn = ttk.Button(exp_group, text="Compute n-th Expansion", command=self.compute_expansion)
-        self.compute_btn.grid(row=1, column=0, columnspan=2, pady=5, sticky=tk.EW)
+        self.compute_btn.grid(row=2, column=0, columnspan=2, pady=5, sticky=tk.EW)
 
         self.viz_btn = ttk.Button(exp_group, text="Visualize Current Seed", command=self.visualize_seed)
-        self.viz_btn.grid(row=2, column=0, columnspan=2, pady=2, sticky=tk.EW)
+        self.viz_btn.grid(row=3, column=0, columnspan=2, pady=2, sticky=tk.EW)
 
         # Examples
         ex_group = ttk.LabelFrame(left_pane, text="Rigid Seed Examples", padding="5")
@@ -259,6 +267,8 @@ class RigidSeedGUI:
         G = nx.Graph()
         node_colors = []
         color_map = {0: 'lightgreen', 1: 'skyblue', 2: 'orange', 3: 'pink', 4: 'violet', 5: 'yellow'}
+        
+        show_disjoint = "Disjoint" in self.edge_type_var.get()
 
         for name, _, gen in curves:
             G.add_node(name)
@@ -270,19 +280,25 @@ class RigidSeedGUI:
                 name2, c2, _ = curves[j]
                 try:
                     inter = c1.intersection(c2)
-                    if inter > 0:
-                        G.add_edge(name1, name2, weight=inter)
+                    if show_disjoint:
+                        if inter == 0:
+                            G.add_edge(name1, name2)
+                    else:
+                        if inter > 0:
+                            G.add_edge(name1, name2, weight=inter)
                 except:
                     pass
 
         pos = nx.spring_layout(G, k=0.5, iterations=50)
         nx.draw(G, pos, ax=self.ax, with_labels=True, node_color=node_colors, 
-                node_size=1000, font_size=7, font_weight='bold')
+                node_size=1200, font_size=8, font_weight='bold', edge_color='gray', alpha=0.9)
         
-        edge_labels = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, ax=self.ax, edge_labels=edge_labels)
+        if not show_disjoint:
+            edge_labels = nx.get_edge_attributes(G, 'weight')
+            nx.draw_networkx_edge_labels(G, pos, ax=self.ax, edge_labels=edge_labels, font_size=7)
         
-        self.ax.set_title(f"Rigid Expansion Graph on S_{self.genus_var.get()}_{self.punc_var.get()}")
+        title_type = "Curve Graph (Edges = Disjoint)" if show_disjoint else "Intersection Graph (Edges = Intersect)"
+        self.ax.set_title(f"{title_type} on S_{self.genus_var.get()}_{self.punc_var.get()}")
         self.canvas.draw()
 
 if __name__ == "__main__":
