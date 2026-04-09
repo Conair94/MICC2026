@@ -1,6 +1,5 @@
-pytest
-numpy
+curver
+flipper
+networkx
+matplotlib
 scipy
-python-termstyle
-six
-pybind11

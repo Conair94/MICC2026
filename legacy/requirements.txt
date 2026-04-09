@@ -1,0 +1,6 @@
+pytest
+numpy
+scipy
+python-termstyle
+six
+pybind11
